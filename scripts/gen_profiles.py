@@ -68,8 +68,8 @@ def gen_profiles(total_profiles: int, total_friends: int) -> list[dict]:
     """
     Generate the profiles
     """
-    logger.info("Loading required data")
     db = SessionLocal()
+    logger.info("Loading required data")
     names = load_items_from_text_file("data/names.txt")
     lastnames = load_items_from_text_file("data/lastnames.txt")
     street_names = load_items_from_text_file("data/street_names.txt")
@@ -88,8 +88,8 @@ def gen_profiles(total_profiles: int, total_friends: int) -> list[dict]:
             last_name=random.choice(lastnames),
             phone=f"{random.randint(100,999)}-{random.randint(100,999)}-{random.randint(1000,9999)}",
             address=f"{random.randint(1000,9000)} {random.choice(street_names)}",
-            city=zip_to_state_city[zip]["city"],
-            state=zip_to_state_city[zip]["state"],
+            city=zip_to_state_city.get(zip).get("city"),
+            state=zip_to_state_city.get(zip).get("state"),
             zipcode=zip,
             available=True
         )
@@ -116,7 +116,6 @@ def gen_profiles(total_profiles: int, total_friends: int) -> list[dict]:
     # Persists the new profiles in the database
     db.add_all(profiles)
     db.commit()
-    db.close()
     logger.info(
         f"{total_profiles} profiles and {total_friends} friend relationships generated successfully")
 
