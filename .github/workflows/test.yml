@@ -1,0 +1,49 @@
+name: Run service automatic tests
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: dspot_test
+        options: >-
+          --health-cmd pg_isready 
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Dump env variables
+        run: |
+          REST_OF_ENV=$(cat <<EOF
+          ENVIRONMENT=development
+          PG_USER=postgres
+          PG_PASSWORD=postgres
+          PG_HOST=localhost
+          PG_PORT=5432
+          PG_DB=dspot_test
+          EOF
+          )
+          echo "$REST_OF_ENV" > .env
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Run tests with coverage
+        run: PYTHONPATH=. pytest -v --cov=app --cov-report=term
