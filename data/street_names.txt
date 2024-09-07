@@ -48,7 +48,6 @@ Hill St
 Lincoln St
 3rd Ave
 Short St
-Street Name	Count	Cities
 Railroad Ave
 Water St
 Maple Ave
