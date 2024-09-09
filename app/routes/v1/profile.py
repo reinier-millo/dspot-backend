@@ -4,7 +4,7 @@ from app.db.config import get_db
 from sqlalchemy.orm import Session
 from app.models.profile import ProfileBase, ProfileResponse, PaginatedProfileResponse
 from app.controllers.db_types import OrderEnum, ProfileOrderFieldEnum
-from app.models.errors import ProfileNotFoundError
+from app.models.errors import PROFILE_NOT_FOUND
 
 
 profile_router = APIRouter(prefix="/profile", tags=["profile"])
@@ -43,14 +43,14 @@ async def get_profile(
     """
     Get a profile by id
     """
-    obj = Profile.get(db, profile_id)
+    obj = await Profile.get(db, profile_id)
     if obj is None:
-        raise HTTPException(status_code=404, detail=ProfileNotFoundError())
+        raise HTTPException(status_code=404, detail=PROFILE_NOT_FOUND)
     return obj
 
 
 @profile_router.get(
-    "/get",
+    "/all",
     response_model=PaginatedProfileResponse,
     status_code=200,
     summary="Get all profiles",
@@ -75,7 +75,7 @@ async def get_profiles(
     Get all profiles
     """
     base_url = request.url._url.split("?")[0]
-    return Profile.get_all(db, base_url, q, skip, limit, field, order)
+    return await Profile.get_all(db, base_url, q, skip, limit, field, order)
 
 
 @profile_router.put(
@@ -96,7 +96,7 @@ async def update_profile(
     """
     obj = await Profile.update(db, profile_id, profile)
     if obj is None:
-        raise HTTPException(status_code=404, detail=ProfileNotFoundError())
+        raise HTTPException(status_code=404, detail=PROFILE_NOT_FOUND)
     return obj
 
 
@@ -117,7 +117,7 @@ async def delete_profile(
     """
     obj = await Profile.delete(db, profile_id)
     if obj is None:
-        raise HTTPException(status_code=404, detail=ProfileNotFoundError())
+        raise HTTPException(status_code=404, detail=PROFILE_NOT_FOUND)
     return obj
 
 
@@ -142,4 +142,4 @@ async def get_friends(
     Get all friends of a profile by id
     """
     base_url = request.url._url.split("?")[0]
-    return Profile.get_friends(db, profile_id, skip, limit)
+    return await Profile.get_friends(db, profile_id, base_url, skip, limit)
