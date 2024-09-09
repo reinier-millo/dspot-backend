@@ -3,13 +3,12 @@ from app.db.models import Profile as ProfileModel, friendship
 from app.models.profile import ProfileBase, ProfileResponse, PaginatedProfileResponse
 from app.controllers.db_types import OrderEnum, ProfileOrderFieldEnum
 from sqlalchemy.orm import Session
-from sqlalchemy import asc, desc
-from typing import List
+from sqlalchemy import asc, desc, select
 
 
 class Profile:
     @staticmethod
-    def create(db: Session, profile: ProfileBase) -> ProfileModel:
+    async def create(db: Session, profile: ProfileBase) -> ProfileModel:
         """
         Create a new profile
         """
@@ -30,7 +29,7 @@ class Profile:
         return db_profile
 
     @staticmethod
-    def get_all(
+    async def get_all(
         db: Session,
         base_url: str,
         q: str = None,
@@ -63,9 +62,6 @@ class Profile:
             base_mult = math.floor(total / limit)
             skip = limit * base_mult
 
-            if skip < 0:
-                skip = 0
-
         # Get profiles data
         profiles_db = query.offset(skip).limit(limit).all()
         profiles = [ProfileResponse.model_validate(
@@ -73,9 +69,9 @@ class Profile:
 
         # Get next and previous page urls
         next_skip = skip + limit
-        next_url = f"{base_url}?{f'q={q}&' if q else ''}skip={next_skip}&limit={limit}&field={field}&order={order.value}" if next_skip < total else None
+        next_url = f"{base_url}?{f'q={q}&' if q else ''}skip={next_skip}&limit={limit}&field={field.value}&order={order.value}" if next_skip < total else None
         previous_skip = skip - limit
-        previous_url = f"{base_url}?{f'q={q}&' if q else ''}skip={previous_skip}&limit={limit}&field={field}&order={order.value}" if previous_skip >= 0 else None
+        previous_url = f"{base_url}?{f'q={q}&' if q else ''}skip={previous_skip}&limit={limit}&field={field.value}&order={order.value}" if previous_skip >= 0 else None
 
         # Return paginated profiles
         return PaginatedProfileResponse(
@@ -86,14 +82,14 @@ class Profile:
         )
 
     @staticmethod
-    def get(db: Session, profile_id: int) -> ProfileModel | None:
+    async def get(db: Session, profile_id: int) -> ProfileModel | None:
         """
         Get a profile by id
         """
         return db.query(ProfileModel).filter(ProfileModel.id == profile_id).first()
 
     @staticmethod
-    def update(db: Session, profile_id: int, profile: ProfileBase) -> ProfileModel | None:
+    async def update(db: Session, profile_id: int, profile: ProfileBase) -> ProfileModel | None:
         """
         Update a profile by id
         """
@@ -115,7 +111,7 @@ class Profile:
         return None
 
     @staticmethod
-    def delete(db: Session, profile_id: int) -> ProfileModel | None:
+    async def delete(db: Session, profile_id: int) -> ProfileModel | None:
         """
         Delete a profile by id
         """
@@ -128,27 +124,39 @@ class Profile:
         return None
 
     @staticmethod
-    def get_friends(db: Session, profile_id: int, base_url: str, skip: int = 0, limit: int = 10) -> PaginatedProfileResponse:
+    async def get_friends(
+        db: Session,
+        profile_id: int,
+        base_url: str,
+        skip: int = 0,
+        limit: int = 10
+    ) -> PaginatedProfileResponse:
         """
         Get all friends of a profile by id
         """
         # Subquery to get friend IDs
-        friendship_subquery = db.query(friendship.c.friend_id).filter(
-            friendship.c.profile_id == profile_id).subquery()
+        friend_ids_select = select(friendship.c.friend_id).where(
+            friendship.c.profile_id == profile_id)
+        inverse_friend_ids_select = select(friendship.c.profile_id).where(
+            friendship.c.friend_id == profile_id)
 
         # Query to get friend profiles
         query = db.query(ProfileModel).filter(
-            ProfileModel.id.in_(friendship_subquery))
+            ProfileModel.id.in_(friend_ids_select) |
+            ProfileModel.id.in_(inverse_friend_ids_select))
 
         # Get total number of friends for pagination
         total = query.count()
+
+        print(f"Total: {total}")
+
+        print(f"Skip: {skip}")
+        print(f"Limit: {limit}")
 
         # Ensure skip is not greater than total
         if skip >= total:
             base_mult = math.floor(total / limit)
             skip = limit * base_mult
-            if skip < 0:
-                skip = 0
 
         # Get friends data
         friends_db = query.offset(skip).limit(limit).all()
