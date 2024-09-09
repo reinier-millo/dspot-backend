@@ -39,6 +39,18 @@ def create_profiles(client: TestClient, db: Session, num_profiles: int):
     assert db.query(Profile).count() == PROFILES_TO_CREATE
 
 
+def create_friendship(client: TestClient, db: Session, profile_id: int, friend_id: int):
+    """
+    Helper function to create a friendship
+    """
+    response = client.post(
+        "/v1/friendship/create", json={"profile_id": profile_id, "friend_id": friend_id})
+    assert response.status_code == 201
+    friendship = response.json()
+    assert friendship == {"profile_id": profile_id, "friend_id": friend_id}
+    return friendship
+
+
 def create_friendships(client: TestClient, db: Session, num_profiles: int):
     """
     Helper function to create a number of friendships
@@ -49,8 +61,4 @@ def create_friendships(client: TestClient, db: Session, num_profiles: int):
     # Call to create the friendships
     for i in range(1, num_profiles):
         for j in range(i+1, num_profiles+1):
-            response = client.post(
-                "/v1/friendship/create", json={"profile_id": i, "friend_id": j})
-            assert response.status_code == 201
-            friendship = response.json()
-            assert friendship == {"profile_id": i, "friend_id": j}
+            create_friendship(client, db, i, j)

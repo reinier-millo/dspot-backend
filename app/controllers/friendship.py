@@ -1,4 +1,5 @@
 from app.db.models import Profile, friendship
+from collections import deque
 from sqlalchemy import select, delete
 from sqlalchemy.orm import Session
 
@@ -17,7 +18,7 @@ class Friendship:
         return relationship is not None
 
     @staticmethod
-    def create(db: Session, profile_id: int, friend_id: int):
+    async def create(db: Session, profile_id: int, friend_id: int):
         """
         Create a new friendship relationship
         """
@@ -40,7 +41,7 @@ class Friendship:
         return (profile_id, friend_id)
 
     @staticmethod
-    def delete(db: Session, profile_id: int, friend_id: int):
+    async def delete(db: Session, profile_id: int, friend_id: int):
         """
         Delete a friendship relationship
         """
@@ -55,3 +56,40 @@ class Friendship:
         db.execute(stmt)
         db.commit()
         return True
+
+    @staticmethod
+    def get_all_friends(db: Session, profile_id: int) -> list[int]:
+        """
+        Get all friends of a profile by id
+        """
+        friend_ids_stmt = (
+            select(friendship.c.friend_id)
+            .where(friendship.c.profile_id == profile_id)
+            .union(
+                select(friendship.c.profile_id)
+                .where(friendship.c.friend_id == profile_id)
+            )
+        )
+        return db.scalars(friend_ids_stmt).all()
+
+    @staticmethod
+    async def get_connection(db: Session, profile_id: int, friend_id: int) -> list[int]:
+        """
+        Get the shorter connection between two profiles applying Breadth First Search algorithm
+        """
+        # Initialize the queue with the starting profile
+        queue = deque([(profile_id, [profile_id])])
+        visited = set()
+
+        # Perform BFS
+        while queue:
+            current_profile, path = queue.popleft()
+            if current_profile == friend_id:
+                return path
+            if current_profile not in visited:
+                visited.add(current_profile)
+                friends = Friendship.get_all_friends(db, current_profile)
+                for friend in friends:
+                    if friend not in visited:
+                        queue.append((friend, path + [friend]))
+        return []
