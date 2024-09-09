@@ -1,8 +1,11 @@
+"""
+Utils for the tests
+"""
 from fastapi.testclient import TestClient
 from fastapi import Response
 from sqlalchemy.orm import Session
 from app.db.models import Profile
-from tests.constants import PROFILES_TO_CREATE, PROFILE_DATA
+from tests.constants import PROFILE_DATA
 
 
 def assert_profile_match(created_profile: dict, expected_data: dict):
@@ -28,7 +31,7 @@ def create_profiles(client: TestClient, db: Session, num_profiles: int):
     """
     Helper function to create a number of profiles
     """
-    for i in range(1, PROFILES_TO_CREATE+1):
+    for _ in range(1, num_profiles+1):
         response = client.post(
             "/v1/profile/create", json=PROFILE_DATA)
         assert response.status_code == 201
@@ -36,10 +39,10 @@ def create_profiles(client: TestClient, db: Session, num_profiles: int):
         assert_profile_match(created_profile, PROFILE_DATA)
 
     # Validate the number of profiles
-    assert db.query(Profile).count() == PROFILES_TO_CREATE
+    assert db.query(Profile).count() == num_profiles
 
 
-def create_friendship(client: TestClient, db: Session, profile_id: int, friend_id: int):
+def create_friendship(client: TestClient, profile_id: int, friend_id: int):
     """
     Helper function to create a friendship
     """
@@ -61,4 +64,4 @@ def create_friendships(client: TestClient, db: Session, num_profiles: int):
     # Call to create the friendships
     for i in range(1, num_profiles):
         for j in range(i+1, num_profiles+1):
-            create_friendship(client, db, i, j)
+            create_friendship(client, i, j)

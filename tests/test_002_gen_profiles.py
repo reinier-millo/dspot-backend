@@ -1,6 +1,9 @@
-import pytest
+"""
+Tests for the gen_profiles script
+"""
 import re
 import random
+import pytest
 from sqlalchemy.orm import Session
 from scripts.gen_profiles import (load_items_from_text_file, load_items_from_json_file,
                                   gen_profile_picture, gen_phone_number, gen_friend_relationship, gen_profiles)
@@ -8,10 +11,16 @@ from app.db.models import Profile, friendship
 
 
 class TestGenProfileScript:
+    """
+    Tests for the gen_profiles script
+    """
+
     @pytest.fixture(autouse=True)
     def setup(self, db_session: Session):
-        self.db = db_session
-        self.next_url = None
+        """
+        Setup the test
+        """
+        self.db = db_session  # pylint: disable=attribute-defined-outside-init
 
     def test_load_items_from_text_file(self):
         """
@@ -55,7 +64,7 @@ class TestGenProfileScript:
         """
         Test the gen_friend_relationship function
         """
-        for i in range(1000):
+        for _ in range(1000):
             (profile_idx, friend_idx) = gen_friend_relationship(10)
             assert 0 <= profile_idx <= 10 and 0 <= friend_idx <= 10
             assert profile_idx != friend_idx
@@ -66,7 +75,7 @@ class TestGenProfileScript:
         """
         num_profiles = 0
         num_friends = 0
-        for i in range(10):
+        for _ in range(10):
             new_profiles_cnt = random.randint(10, 100)
             new_friends_cnt = random.randint(5, new_profiles_cnt)
             gen_profiles(new_profiles_cnt, new_friends_cnt)

@@ -1,17 +1,27 @@
+"""
+Tests for the profile CRUD
+"""
 import pytest
 from fastapi.testclient import TestClient
-from fastapi import Response
 from sqlalchemy.orm import Session
 from app.db.models import Profile
-from tests.constants import PROFILES_TO_CREATE, PROFILES_TO_UPDATE, PROFILES_TO_DELETE, AFTER_DELETE_PROFILES, PROFILE_DATA, NON_VALID_PROFILE_ID
+from tests.constants import (PROFILES_TO_CREATE, PROFILES_TO_UPDATE,
+                             PROFILES_TO_DELETE, AFTER_DELETE_PROFILES, PROFILE_DATA, NON_VALID_PROFILE_ID)
 from tests.utils import assert_profile_match, assert_data_not_found, create_profiles
 
 
 class TestProfileCRUD:
+    """
+    Tests for the profile CRUD
+    """
+
     @pytest.fixture(autouse=True)
     def setup(self, db_session: Session, test_client: TestClient):
-        self.db = db_session
-        self.client = test_client
+        """
+        Setup the test
+        """
+        self.db = db_session  # pylint: disable=attribute-defined-outside-init
+        self.client = test_client  # pylint: disable=attribute-defined-outside-init
 
     def test_create_profile(self):
         """

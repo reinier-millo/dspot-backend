@@ -1,7 +1,10 @@
-from app.db.config import Base
+"""
+Database models
+"""
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Table, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+from app.db.config import Base
 
 # Define the many-to-many friendship relationship table
 friendship = Table(
@@ -11,11 +14,12 @@ friendship = Table(
         "profiles.id"), index=True, primary_key=True),
     Column("friend_id", Integer, ForeignKey(
         "profiles.id"), index=True, primary_key=True),
-    Column("created_at", DateTime, server_default=func.now(), index=True)
+    Column("created_at", DateTime, server_default=func.now(),  # pylint: disable=not-callable
+           index=True)
 )
 
 
-class Profile(Base):
+class Profile(Base):  # pylint: disable=too-few-public-methods
     """
     Profile model
     """
@@ -30,9 +34,10 @@ class Profile(Base):
     state = Column(String, index=True, nullable=True)
     zipcode = Column(String, index=True, nullable=True)
     available = Column(Boolean, default=True)
-    created_at = Column(DateTime, server_default=func.now(), index=True)
-    updated_at = Column(DateTime, server_default=func.now(),
-                        server_onupdate=func.now(), index=True)
+    created_at = Column(DateTime, server_default=func.now(),  # pylint: disable=not-callable
+                        index=True)
+    updated_at = Column(DateTime, server_default=func.now(),  # pylint: disable=not-callable
+                        server_onupdate=func.now(), index=True)  # pylint: disable=not-callable
 
     friends = relationship(
         "Profile",

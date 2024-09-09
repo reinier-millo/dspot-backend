@@ -1,9 +1,10 @@
-import uvicorn
+""" Main entry point for the API """
 import os
+from pathlib import Path
+from dotenv import load_dotenv
+import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from dotenv import load_dotenv
-from pathlib import Path
 
 # Import routes
 from app.routes.health import health_router

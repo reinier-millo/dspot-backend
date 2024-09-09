@@ -1,4 +1,6 @@
-""" Predefined constants for testing """
+"""
+Predefined constants for testing 
+"""
 
 PROFILES_TO_CREATE = 100
 PROFILES_TO_UPDATE = 50

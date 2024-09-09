@@ -1,9 +1,12 @@
+"""
+Routes for the friendship
+"""
 from fastapi import APIRouter, Depends, HTTPException, Path, Body
+from sqlalchemy.orm import Session
+from app.constants import PROFILE_NOT_FOUND, FRIEND_NOT_FOUND, FRIENDSHIP_NOT_FOUND, FRIENDSHIP_SAME_PROFILE
 from app.controllers.friendship import Friendship
 from app.db.config import get_db
-from sqlalchemy.orm import Session
 from app.models.friendship import FriendshipBase, FriendshipConnectionResponse
-from app.models.errors import PROFILE_NOT_FOUND, FRIEND_NOT_FOUND, FRIENDSHIP_NOT_FOUND, FRIENDSHIP_SAME_PROFILE
 
 
 friendship_router = APIRouter(prefix="/friendship", tags=["friendship"])

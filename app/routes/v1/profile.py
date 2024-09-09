@@ -1,10 +1,13 @@
+"""
+Routes for the profile
+"""
 from fastapi import APIRouter, Depends, HTTPException, Query, Path, Body, Request
-from app.controllers.profile import Profile
-from app.db.config import get_db
 from sqlalchemy.orm import Session
-from app.models.profile import ProfileBase, ProfileResponse, PaginatedProfileResponse
 from app.controllers.db_types import OrderEnum, ProfileOrderFieldEnum
-from app.models.errors import PROFILE_NOT_FOUND
+from app.controllers.profile import Profile
+from app.constants import PROFILE_NOT_FOUND
+from app.db.config import get_db
+from app.models.profile import ProfileBase, ProfileResponse, PaginatedProfileResponse
 
 
 profile_router = APIRouter(prefix="/profile", tags=["profile"])
@@ -57,7 +60,7 @@ async def get_profile(
     description="Get all profiles or the profiles filtered by name or last name",
     response_description="Return the profiles results paginated",
 )
-async def get_profiles(
+async def get_profiles(  # pylint: disable=too-many-arguments
     request: Request,
     q: str = Query(
         None, description="Search query to filter profiles by name or last name", min_length=3),
@@ -66,15 +69,16 @@ async def get_profiles(
     limit: int = Query(
         10, description="Limit records to get paginated results", ge=1, le=200),
     field: ProfileOrderFieldEnum = Query(
-        ProfileOrderFieldEnum.created_at, description="Sort field used to order the results"),
+        ProfileOrderFieldEnum.CREATED_AT, description="Sort field used to order the results"),
     order: OrderEnum = Query(
-        OrderEnum.asc, description="Sort order used to order the results"),
+        OrderEnum.ASC, description="Sort order used to order the results"),
     db: Session = Depends(get_db)
 ):
     """
     Get all profiles
     """
-    base_url = request.url._url.split("?")[0]
+    base_url = request.url._url.split(  # pylint: disable=protected-access
+        "?")[0]
     return await Profile.get_all(db, base_url, q, skip, limit, field, order)
 
 
@@ -141,5 +145,6 @@ async def get_friends(
     """
     Get all friends of a profile by id
     """
-    base_url = request.url._url.split("?")[0]
+    base_url = request.url._url.split(  # pylint: disable=protected-access
+        "?")[0]
     return await Profile.get_friends(db, profile_id, base_url, skip, limit)

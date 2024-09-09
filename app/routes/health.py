@@ -1,3 +1,6 @@
+"""
+Routes for the health check
+"""
 from fastapi import APIRouter
 from app.constants import API_VERSION
 from app.models.health import Health

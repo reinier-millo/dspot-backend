@@ -1,18 +1,28 @@
+"""
+Tests for the friendship CRUD
+"""
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import func
+from sqlalchemy.sql import func
 from sqlalchemy.orm import Session
 from app.db.models import friendship as FriendshipTable
-from app.models.errors import PROFILE_NOT_FOUND, FRIEND_NOT_FOUND, FRIENDSHIP_NOT_FOUND, FRIENDSHIP_SAME_PROFILE
+from app.constants import PROFILE_NOT_FOUND, FRIEND_NOT_FOUND, FRIENDSHIP_NOT_FOUND, FRIENDSHIP_SAME_PROFILE
 from tests.constants import PROFILES_FRIENDSHIPS_TO_CREATE, NON_VALID_PROFILE_ID
 from tests.utils import assert_data_not_found, create_friendships
 
 
 class TestFriendshipCRUD:
+    """
+    Tests for the friendship CRUD
+    """
+
     @pytest.fixture(autouse=True)
     def setup(self, db_session: Session, test_client: TestClient):
-        self.db = db_session
-        self.client = test_client
+        """
+        Setup the test
+        """
+        self.db = db_session  # pylint: disable=attribute-defined-outside-init
+        self.client = test_client  # pylint: disable=attribute-defined-outside-init
 
     def test_create_friendship(self):
         """
@@ -61,7 +71,7 @@ class TestFriendshipCRUD:
         Check the number of friendships
         """
         friendship_count = self.db.query(
-            func.count()).select_from(FriendshipTable).scalar()
+            func.count()).select_from(FriendshipTable).scalar()  # pylint: disable=not-callable
         assert friendship_count == PROFILES_FRIENDSHIPS_TO_CREATE * \
             (PROFILES_FRIENDSHIPS_TO_CREATE - 1) / 2
 
@@ -86,5 +96,5 @@ class TestFriendshipCRUD:
         Check the number of friendships after delete
         """
         friendship_count = self.db.query(
-            func.count()).select_from(FriendshipTable).scalar()
+            func.count()).select_from(FriendshipTable).scalar()  # pylint: disable=not-callable
         assert friendship_count == 0

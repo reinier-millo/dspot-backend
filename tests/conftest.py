@@ -1,10 +1,13 @@
-from app.db.config import engine, SessionLocal
-import pytest
+"""
+Pytest configuration
+"""
 from typing import Generator
+import pytest
 from sqlalchemy.orm import Session
+from fastapi.testclient import TestClient
 from alembic.command import downgrade, upgrade
 from alembic.config import Config as AlembicConfig
-from fastapi.testclient import TestClient
+from app.db.config import engine, SessionLocal
 from app.main import app
 
 

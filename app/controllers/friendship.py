@@ -1,10 +1,17 @@
-from app.db.models import Profile, friendship
+"""
+Logic for managing friendship relationships between profiles.
+"""
 from collections import deque
 from sqlalchemy import select, delete
 from sqlalchemy.orm import Session
+from app.db.models import Profile, friendship
 
 
 class Friendship:
+    """
+    Logic for managing friendship relationships between profiles.
+    """
+
     @staticmethod
     def exists(db: Session, profile_id: int, friend_id: int):
         """

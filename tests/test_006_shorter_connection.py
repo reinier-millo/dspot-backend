@@ -1,3 +1,6 @@
+"""
+Tests for the shorter connection endpoint
+"""
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
@@ -7,10 +10,17 @@ from tests.utils import create_profiles, create_friendship
 
 
 class TestShorterConnection:
+    """
+    Tests for the shorter connection endpoint
+    """
+
     @pytest.fixture(autouse=True)
     def setup(self, db_session: Session, test_client: TestClient):
-        self.db = db_session
-        self.client = test_client
+        """
+        Setup the test
+        """
+        self.db = db_session  # pylint: disable=attribute-defined-outside-init
+        self.client = test_client  # pylint: disable=attribute-defined-outside-init
 
     def test_prepare_data(self):
         """
@@ -21,11 +31,11 @@ class TestShorterConnection:
                         PROFILES_FRIENDSHIPS_TO_CREATE)
 
         # Call to create the friendships
-        create_friendship(self.client, self.db, 3, 6)
-        create_friendship(self.client, self.db, 3, 1)
-        create_friendship(self.client, self.db, 1, 2)
-        create_friendship(self.client, self.db, 2, 4)
-        create_friendship(self.client, self.db, 6, 4)
+        create_friendship(self.client, 3, 6)
+        create_friendship(self.client, 3, 1)
+        create_friendship(self.client, 1, 2)
+        create_friendship(self.client, 2, 4)
+        create_friendship(self.client, 6, 4)
 
     def test_get_all_friends(self):
         """

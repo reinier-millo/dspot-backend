@@ -1,3 +1,6 @@
+"""
+This script generates random profiles and friend relationships.
+"""
 import json
 import argparse
 import random
@@ -17,7 +20,7 @@ def load_items_from_text_file(file_path: str) -> list[str]:
     Load the items from text file to be used for profile generation
     """
     items = []
-    with open(file_path, "r") as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         items = [line.strip() for line in f.readlines()]
     return items
 
@@ -27,7 +30,7 @@ def load_items_from_json_file(file_path: str) -> dict:
     Load the items from JSON to be used for profile generation
     """
     items = {}
-    with open(file_path, "r") as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         items = json.load(f)
     return items
 
@@ -37,7 +40,7 @@ def gen_profile_picture() -> str:
     Generate the profile picture
     """
     picture_id = random.randint(10000, 150000)
-    return f"https://images.pexels.com/photos/{picture_id}/pexels-photo-{picture_id}.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
+    return f"https://images.pexels.com/photos/{picture_id}/pexels-photo-{picture_id}.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"  # pylint: disable=line-too-long
 
 
 def gen_phone_number() -> str:
@@ -64,7 +67,7 @@ def gen_friend_relationship(max_profiles: int) -> tuple[int, int]:
     return (profile_idx, friend_idx)
 
 
-def gen_profiles(total_profiles: int, total_friends: int) -> list[dict]:
+def gen_profiles(total_profiles: int, total_friends: int) -> list[dict]:  # pylint: disable=too-many-locals
     """
     Generate the profiles
     """
@@ -80,17 +83,17 @@ def gen_profiles(total_profiles: int, total_friends: int) -> list[dict]:
     # Prepare the new profiles to be generated
     logger.info("Start profiles generation")
     profiles: list[Profile] = []
-    for i in range(total_profiles):
-        zip = random.choice(zips)
+    for _ in range(total_profiles):
+        zipcode = random.choice(zips)
         profile = Profile(
             img=gen_profile_picture(),
             first_name=random.choice(names),
             last_name=random.choice(lastnames),
             phone=gen_phone_number(),
             address=f"{random.randint(1000,9000)} {random.choice(street_names)}",
-            city=zip_to_state_city.get(zip).get("city"),
-            state=zip_to_state_city.get(zip).get("state"),
-            zipcode=zip,
+            city=zip_to_state_city.get(zipcode).get("city"),
+            state=zip_to_state_city.get(zipcode).get("state"),
+            zipcode=zipcode,
             available=True
         )
         profiles.append(profile)
@@ -99,7 +102,7 @@ def gen_profiles(total_profiles: int, total_friends: int) -> list[dict]:
     logger.info("Start friend relationships generation")
     max_idx = total_profiles - 1
     generated_friends = []
-    for i in range(total_friends):
+    for _ in range(total_friends):
         # Look for the random profile and friend
         (profile_idx, friend_idx) = gen_friend_relationship(max_idx)
         key = f"{profile_idx}-{friend_idx}"
@@ -117,7 +120,8 @@ def gen_profiles(total_profiles: int, total_friends: int) -> list[dict]:
     db.add_all(profiles)
     db.commit()
     logger.info(
-        f"{total_profiles} profiles and {total_friends} friend relationships generated successfully")
+        "%d profiles and %d friend relationships generated successfully",
+        total_profiles, total_friends)
 
 
 if __name__ == "__main__":

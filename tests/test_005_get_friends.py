@@ -1,3 +1,6 @@
+"""
+Tests for the get friends endpoint
+"""
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
@@ -6,10 +9,17 @@ from tests.utils import create_friendships
 
 
 class TestGetFriends:
+    """
+    Tests for the get friends endpoint
+    """
+
     @pytest.fixture(autouse=True)
     def setup(self, db_session: Session, test_client: TestClient):
-        self.db = db_session
-        self.client = test_client
+        """
+        Setup the test
+        """
+        self.db = db_session  # pylint: disable=attribute-defined-outside-init
+        self.client = test_client  # pylint: disable=attribute-defined-outside-init
 
     def test_get_friends(self):
         """

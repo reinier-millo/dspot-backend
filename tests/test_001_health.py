@@ -1,13 +1,22 @@
+"""
+Tests for the health endpoint
+"""
 import pytest
 from fastapi.testclient import TestClient
 from app.constants import API_VERSION
 
 
 class TestHealth:
+    """
+    Tests for the health endpoint
+    """
+
     @pytest.fixture(autouse=True)
     def setup(self, test_client: TestClient):
-        self.client = test_client
-        self.next_url = None
+        """
+        Setup the test
+        """
+        self.client = test_client  # pylint: disable=attribute-defined-outside-init
 
     def test_health(self):
         """
