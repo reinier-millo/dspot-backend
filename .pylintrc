@@ -1,0 +1,5 @@
+[MAIN]
+ignore-paths=python|alembic
+
+[FORMAT]
+max-line-length=120

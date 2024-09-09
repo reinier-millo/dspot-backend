@@ -45,5 +45,8 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements-dev.txt
 
+      - name: Run lint
+        run: ./lint.sh
+
       - name: Run tests with coverage
         run: PYTHONPATH=. pytest -v --cov=app --cov-report=term
