@@ -148,11 +148,6 @@ class Profile:
         # Get total number of friends for pagination
         total = query.count()
 
-        print(f"Total: {total}")
-
-        print(f"Skip: {skip}")
-        print(f"Limit: {limit}")
-
         # Ensure skip is not greater than total
         if skip >= total:
             base_mult = math.floor(total / limit)
