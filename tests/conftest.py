@@ -8,14 +8,13 @@ from fastapi.testclient import TestClient
 from app.main import app
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="class")
 def db_session() -> Generator[Session, None, None]:
     """
     Create a new database session for the test
     """
     # Configure the Alembic settings to indicate that we are running in test mode
     config = AlembicConfig("alembic.ini")
-    config.set_main_option("run_mode", "test")
 
     # Open connection to database and run migrations
     connection = engine.connect()
@@ -31,7 +30,7 @@ def db_session() -> Generator[Session, None, None]:
     connection.close()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="class")
 def test_client():
     """
     Create a new test client for the API
