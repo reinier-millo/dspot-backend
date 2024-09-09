@@ -119,3 +119,27 @@ async def delete_profile(
     if obj is None:
         raise HTTPException(status_code=404, detail=ProfileNotFoundError())
     return obj
+
+
+@profile_router.get(
+    "/{profile_id}/friends",
+    response_model=PaginatedProfileResponse,
+    status_code=200,
+    summary="Get all friends of a profile",
+    description="Get all friends of a profile by id",
+    response_description="Return the friends of the profile"
+)
+async def get_friends(
+    request: Request,
+    profile_id: int = Path(description="The ID of the profile to get friends"),
+    skip: int = Query(
+        0, description="Skip records to get paginated results", ge=0),
+    limit: int = Query(
+        10, description="Limit records to get paginated results", ge=1, le=200),
+    db: Session = Depends(get_db)
+):
+    """
+    Get all friends of a profile by id
+    """
+    base_url = request.url._url.split("?")[0]
+    return Profile.get_friends(db, profile_id, skip, limit)

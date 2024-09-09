@@ -1,5 +1,5 @@
 import math
-from app.db.models import Profile as ProfileModel
+from app.db.models import Profile as ProfileModel, friendship
 from app.models.profile import ProfileBase, ProfileResponse, PaginatedProfileResponse
 from app.controllers.db_types import OrderEnum, ProfileOrderFieldEnum
 from sqlalchemy.orm import Session
@@ -126,3 +126,45 @@ class Profile:
             db.commit()
             return db_profile
         return None
+
+    @staticmethod
+    def get_friends(db: Session, profile_id: int, base_url: str, skip: int = 0, limit: int = 10) -> PaginatedProfileResponse:
+        """
+        Get all friends of a profile by id
+        """
+        # Subquery to get friend IDs
+        friendship_subquery = db.query(friendship.c.friend_id).filter(
+            friendship.c.profile_id == profile_id).subquery()
+
+        # Query to get friend profiles
+        query = db.query(ProfileModel).filter(
+            ProfileModel.id.in_(friendship_subquery))
+
+        # Get total number of friends for pagination
+        total = query.count()
+
+        # Ensure skip is not greater than total
+        if skip >= total:
+            base_mult = math.floor(total / limit)
+            skip = limit * base_mult
+            if skip < 0:
+                skip = 0
+
+        # Get friends data
+        friends_db = query.offset(skip).limit(limit).all()
+        friends_list = [ProfileResponse.model_validate(
+            friend) for friend in friends_db]
+
+        # Get next and previous page urls
+        next_skip = skip + limit
+        next_url = f"{base_url}?skip={next_skip}&limit={limit}" if next_skip < total else None
+        previous_skip = skip - limit
+        previous_url = f"{base_url}?skip={previous_skip}&limit={limit}" if previous_skip >= 0 else None
+
+        # Return paginated friends
+        return PaginatedProfileResponse(
+            total=total,
+            next_url=next_url,
+            previous_url=previous_url,
+            profiles=friends_list,
+        )
