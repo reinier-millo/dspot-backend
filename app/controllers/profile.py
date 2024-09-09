@@ -9,7 +9,7 @@ from typing import List
 
 class Profile:
     @staticmethod
-    def create_profile(db: Session, profile: ProfileBase) -> ProfileModel:
+    def create(db: Session, profile: ProfileBase) -> ProfileModel:
         """
         Create a new profile
         """
@@ -30,7 +30,7 @@ class Profile:
         return db_profile
 
     @staticmethod
-    def get_profiles(
+    def get_all(
         db: Session,
         base_url: str,
         q: str = None,
@@ -85,14 +85,14 @@ class Profile:
         )
 
     @staticmethod
-    def get_profile(db: Session, profile_id: int) -> ProfileModel | None:
+    def get(db: Session, profile_id: int) -> ProfileModel | None:
         """
         Get a profile by id
         """
         return db.query(ProfileModel).filter(ProfileModel.id == profile_id).first()
 
     @staticmethod
-    def update_profile(db: Session, profile_id: int, profile: ProfileBase) -> ProfileModel | None:
+    def update(db: Session, profile_id: int, profile: ProfileBase) -> ProfileModel | None:
         """
         Update a profile by id
         """
@@ -114,7 +114,7 @@ class Profile:
         return None
 
     @staticmethod
-    def delete_profile(db: Session, profile_id: int) -> ProfileModel | None:
+    def delete(db: Session, profile_id: int) -> ProfileModel | None:
         """
         Delete a profile by id
         """

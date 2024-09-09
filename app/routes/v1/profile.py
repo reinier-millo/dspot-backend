@@ -25,7 +25,7 @@ async def create_profile(
     """
     Create a new profile
     """
-    return await Profile.create_profile(db, profile)
+    return await Profile.create(db, profile)
 
 
 @profile_router.get(
@@ -43,7 +43,7 @@ async def get_profile(
     """
     Get a profile by id
     """
-    obj = Profile.get_profile(db, profile_id)
+    obj = Profile.get(db, profile_id)
     if obj is None:
         raise HTTPException(status_code=404, detail=ProfileNotFoundError())
     return obj
@@ -57,7 +57,7 @@ async def get_profile(
     description="Get all profiles or the profiles filtered by name or last name",
     response_description="Return the profiles results paginated",
 )
-async def get_profile(
+async def get_profiles(
     request: Request,
     q: str = Query(
         None, description="Search query to filter profiles by name or last name", min_length=3),
@@ -75,7 +75,7 @@ async def get_profile(
     Get all profiles
     """
     base_url = request.url._url.split("?")[0]
-    return Profile.get_profiles(db, base_url, q, skip, limit, field, order)
+    return Profile.get_all(db, base_url, q, skip, limit, field, order)
 
 
 @profile_router.put(
@@ -94,7 +94,7 @@ async def update_profile(
     """
     Update a profile by id
     """
-    obj = await Profile.update_profile(db, profile_id, profile)
+    obj = await Profile.update(db, profile_id, profile)
     if obj is None:
         raise HTTPException(status_code=404, detail=ProfileNotFoundError())
     return obj
@@ -115,7 +115,7 @@ async def delete_profile(
     """
     Delete a profile by id
     """
-    obj = await Profile.delete_profile(db, profile_id)
+    obj = await Profile.delete(db, profile_id)
     if obj is None:
         raise HTTPException(status_code=404, detail=ProfileNotFoundError())
     return obj
