@@ -18,7 +18,6 @@ if [ ! -e ".env" ]; then
     cp .env.example .env
 fi
 
-echo "Running autopep8 on: $files"
-autopep8 --in-place --recursive $files
 
+echo "Running pylint on: $files"
 pylint --rcfile=.pylintrc $files
