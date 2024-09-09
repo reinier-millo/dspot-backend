@@ -1,6 +1,7 @@
 from app.db.config import Base
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Table
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Table, DateTime
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
 # Define the many-to-many friend relationship table
 friends = Table(
@@ -10,6 +11,7 @@ friends = Table(
         "profiles.id"), index=True, primary_key=True),
     Column("friend_id", Integer, ForeignKey(
         "profiles.id"), index=True, primary_key=True),
+    Column("created_at", DateTime, server_default=func.now(), index=True)
 )
 
 
@@ -23,11 +25,14 @@ class Profile(Base):
     first_name = Column(String, index=True)
     last_name = Column(String)
     phone = Column(String)
-    address = Column(String)
-    city = Column(String, index=True)
-    state = Column(String, index=True)
-    zipcode = Column(String, index=True)
-    available = Column(Boolean)
+    address = Column(String, nullable=True)
+    city = Column(String, index=True, nullable=True)
+    state = Column(String, index=True, nullable=True)
+    zipcode = Column(String, index=True, nullable=True)
+    available = Column(Boolean, default=True)
+    created_at = Column(DateTime, server_default=func.now(), index=True)
+    updated_at = Column(DateTime, server_default=func.now(),
+                        server_onupdate=func.now(), index=True)
 
     friends = relationship(
         "Profile",

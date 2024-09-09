@@ -3,7 +3,7 @@ import random
 from sqlalchemy.orm import Session
 from scripts.gen_profiles import (load_items_from_text_file, load_items_from_json_file,
                                   gen_profile_picture, gen_phone_number, gen_friend_relationship, gen_profiles)
-from app.db.profile import Profile, friends
+from app.db.models import Profile, friends
 
 
 def test_load_items_from_text_file():
