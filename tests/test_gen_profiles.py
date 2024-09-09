@@ -3,7 +3,7 @@ import random
 from sqlalchemy.orm import Session
 from scripts.gen_profiles import (load_items_from_text_file, load_items_from_json_file,
                                   gen_profile_picture, gen_phone_number, gen_friend_relationship, gen_profiles)
-from app.db.models import Profile, friends
+from app.db.models import Profile, friendship
 
 
 def test_load_items_from_text_file():
@@ -72,5 +72,5 @@ def test_gen_profiles(db_session: Session):
         num_friends += new_friends_cnt
     total_profiles = db_session.query(Profile).count()
     assert total_profiles == num_profiles
-    total_friends = db_session.query(friends).count()
+    total_friends = db_session.query(friendship).count()
     assert total_friends == num_friends

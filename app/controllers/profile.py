@@ -68,7 +68,8 @@ class Profile:
 
         # Get profiles data
         profiles_db = query.offset(skip).limit(limit).all()
-        profiles = [ProfileResponse.model_validate(profile) for profile in profiles_db]
+        profiles = [ProfileResponse.model_validate(
+            profile) for profile in profiles_db]
 
         # Get next and previous page urls
         next_skip = skip + limit

@@ -3,9 +3,9 @@ from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Table, Date
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
-# Define the many-to-many friend relationship table
-friends = Table(
-    "friends",
+# Define the many-to-many friendship relationship table
+friendship = Table(
+    "friendship",
     Base.metadata,
     Column("profile_id", Integer, ForeignKey(
         "profiles.id"), index=True, primary_key=True),
@@ -36,8 +36,8 @@ class Profile(Base):
 
     friends = relationship(
         "Profile",
-        secondary=friends,
-        primaryjoin=id == friends.c.profile_id,
-        secondaryjoin=id == friends.c.friend_id,
+        secondary=friendship,
+        primaryjoin=id == friendship.c.profile_id,
+        secondaryjoin=id == friendship.c.friend_id,
         backref="friend_of"
     )

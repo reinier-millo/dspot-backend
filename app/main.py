@@ -8,6 +8,7 @@ from pathlib import Path
 # Import routes
 from app.routes.health import health_router
 from app.routes.v1.profile import profile_router
+from app.routes.v1.friendship import friendship_router
 
 # Load environment variables
 load_dotenv(dotenv_path=f"{Path(__file__).parent}/.env")
@@ -37,6 +38,7 @@ app.add_middleware(
 # Configure routes
 app.include_router(health_router, prefix="/health")
 app.include_router(profile_router, prefix="/v1")
+app.include_router(friendship_router, prefix="/v1")
 app.include_router(health_router)
 
 if __name__ == "__main__":

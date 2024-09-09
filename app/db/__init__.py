@@ -1,4 +1,4 @@
 from app.db.config import Base
-from app.db.models import Profile, friends
+from app.db.models import Profile, friendship
 
-__all__ = ["Base", "Profile", "friends"]
+__all__ = ["Base", "Profile", "friendship"]
