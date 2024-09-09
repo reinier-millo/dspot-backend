@@ -3,7 +3,7 @@ import argparse
 import random
 import logging
 from app.db.config import SessionLocal
-from app.db.profile import Profile
+from app.db.models import Profile
 
 logging.basicConfig(
     level=logging.INFO,
@@ -86,7 +86,7 @@ def gen_profiles(total_profiles: int, total_friends: int) -> list[dict]:
             img=gen_profile_picture(),
             first_name=random.choice(names),
             last_name=random.choice(lastnames),
-            phone=f"{random.randint(100,999)}-{random.randint(100,999)}-{random.randint(1000,9999)}",
+            phone=gen_phone_number(),
             address=f"{random.randint(1000,9000)} {random.choice(street_names)}",
             city=zip_to_state_city.get(zip).get("city"),
             state=zip_to_state_city.get(zip).get("state"),
